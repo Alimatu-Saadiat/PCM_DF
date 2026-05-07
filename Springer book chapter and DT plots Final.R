@@ -66,7 +66,7 @@ smsurv <- function(Time, Status, X, beta, w, model) {
 
 
 # LOGIT 
-em.logit.Pois <- function(Time, Status, Time1, Status1,
+em.Logit.Pois <- function(Time, Status, Time1, Status1,
                           X, X1, Z, Z1,
                           b, beta, s0, s01,
                           emmax, eps) {
@@ -145,7 +145,7 @@ em.logit.Pois <- function(Time, Status, Time1, Status1,
   ))
 }
 
-smcure.logit.Pois <- function(train, test,  Var = F, emmax = 1000, eps = 1e-3, nboot = 100){
+smcure.Logit.Pois <- function(train, test,  Var = F, emmax = 1000, eps = 1e-3, nboot = 100){
   
   Time <- train$t; Status <- train$d
   Time1 <- test$t; Status1 <- test$d
@@ -223,7 +223,7 @@ smcure.logit.Pois <- function(train, test,  Var = F, emmax = 1000, eps = 1e-3, n
   }
   
   
-  emfit <- em.logit.Pois(Time, Status, Time1, Status1,
+  emfit <- em.Logit.Pois(Time, Status, Time1, Status1,
                          X, X1, Z, Z1,
                          b_start, beta_start, s0_init, s01_init,
                          emmax, eps) 
@@ -274,7 +274,7 @@ smcure.logit.Pois <- function(train, test,  Var = F, emmax = 1000, eps = 1e-3, n
       }
       
       bootfit <- try(
-        em.logit.Pois(Time_b, Status_b, Time1, Status1,
+        em.Logit.Pois(Time_b, Status_b, Time1, Status1,
                       X_b, X1, Z_b, Z1,
                       b.est, beta.est, s0_b, s01_init, emmax, eps),
         silent = TRUE
@@ -298,7 +298,7 @@ smcure.logit.Pois <- function(train, test,  Var = F, emmax = 1000, eps = 1e-3, n
 
 
 # SPLINE
-em.spline.Pois <- function(Time, Status, Time1, Status1,
+em.Spline.Pois <- function(Time, Status, Time1, Status1,
                            X, X1, Z, Z1,
                            b, beta, s0, s01,
                            emmax, eps) {
@@ -380,7 +380,7 @@ em.spline.Pois <- function(Time, Status, Time1, Status1,
   ))
 }
 
-smcure.spline.Pois <- function(train, test,  Var = TRUE, emmax = 1000, eps = 1e-3, nboot = 100){
+smcure.Spline.Pois <- function(train, test,  Var = TRUE, emmax = 1000, eps = 1e-3, nboot = 100){
   
   Time <- train$t; Status <- train$d
   Time1 <- test$t; Status1 <- test$d
@@ -442,11 +442,11 @@ smcure.spline.Pois <- function(train, test,  Var = TRUE, emmax = 1000, eps = 1e-
   if(any(is.na(s0_init))) s0_init[is.na(s0_init)] <- min(s0_init, na.rm = TRUE)
   if(any(is.na(s01_init))) s01_init[is.na(s01_init)] <- min(s01_init, na.rm = TRUE)
   
-  # --- FIXED SPLINE CONSTRUCTION ---
-  # We only apply splines to continuous variables x2 and x6.
+  # --- FIXED Spline CONSTRUCTION ---
+  # We only apply Splines to continuous variables x2 and x6.
   # Categorical dummies (x3, x4) remain linear.
   
-  # df = 2 is the minimum for a natural spline to be valid.
+  # df = 2 is the minimum for a natural Spline to be valid.
   df_cont <- 2
   
   # Basis for Training
@@ -465,7 +465,7 @@ smcure.spline.Pois <- function(train, test,  Var = TRUE, emmax = 1000, eps = 1e-
   b_start <- rep(0, ncol(Z))
   beta_start <- coxfit_train$coefficients 
   
-  emfit <- em.spline.Pois(Time, Status, Time1, Status1, X, X1, Z, Z1, b_start, beta_start, s0_init, s01_init, emmax, eps)
+  emfit <- em.Spline.Pois(Time, Status, Time1, Status1, X, X1, Z, Z1, b_start, beta_start, s0_init, s01_init, emmax, eps)
   
   if (Var) {
     cat("Starting bootstrap (", nboot, " iterations)...\n")
@@ -508,7 +508,7 @@ smcure.spline.Pois <- function(train, test,  Var = TRUE, emmax = 1000, eps = 1e-
       }
       
       bootfit <- try(
-        em.spline.Pois(Time_b, Status_b, Time1, Status1,
+        em.Spline.Pois(Time_b, Status_b, Time1, Status1,
                        X_b, X1, Z_b, Z1,
                        emfit$b, emfit$latencyfit,
                        s0_b, s01_init, emmax, eps),
@@ -553,7 +553,7 @@ smcure.spline.Pois <- function(train, test,  Var = TRUE, emmax = 1000, eps = 1e-
 
 
 # DECISION TREE
-em.dt.Pois <- function(Time, Status, Time1, Status1,
+em.DT.Pois <- function(Time, Status, Time1, Status1,
                        X, X1, Z, Z1,
                        beta, s0, s01,
                        uncureprob, uncurepred,
@@ -644,7 +644,7 @@ em.dt.Pois <- function(Time, Status, Time1, Status1,
               s0 = s, S = s, tau = convergence,best_params = best_params))
 }
 
-smcure.dt.Pois <- function(train, test, Var = TRUE, emmax = 1000, eps = 1e-3, nboot = 100) {
+smcure.DT.Pois <- function(train, test, Var = TRUE, emmax = 1000, eps = 1e-3, nboot = 100) {
   Time <- train$t; Status <- train$d
   Time1 <- test$t; Status1 <- test$d
   X <- model.matrix(~ x2 + x3 + x4 + x6, data = train)
@@ -678,7 +678,7 @@ smcure.dt.Pois <- function(train, test, Var = TRUE, emmax = 1000, eps = 1e-3, nb
   
   # --- Pre-tuning of Decision Tree  ---
   nw <- factor(Status, levels = c(0,1), labels = c("cured","uncured"))
-  Zdt <- as.data.frame(Z[, -1, drop = FALSE])
+  ZDT <- as.data.frame(Z[, -1, drop = FALSE])
   K <- 10; set.seed(1)
   pos <- which(nw == "uncured"); neg <- which(nw == "cured")
   fpos <- split(sample(pos), rep(1:K, length.out = length(pos)))
@@ -704,14 +704,14 @@ smcure.dt.Pois <- function(train, test, Var = TRUE, emmax = 1000, eps = 1e-3, nb
         
         for (k in 1:K) {
           vl <- folds[[k]]
-          tr <- setdiff(seq_len(nrow(Zdt)), vl)
+          tr <- setdiff(seq_len(nrow(ZDT)), vl)
           
           if (length(unique(nw[tr])) < 2 || length(unique(nw[vl])) < 2) next
           
           fit <- try(
             rpart::rpart(
               nw ~ .,
-              data = data.frame(Zdt, nw = nw)[tr, ],
+              data = data.frame(ZDT, nw = nw)[tr, ],
               method = "class",
               control = rpart::rpart.control(
                 cp = cp_val,
@@ -724,7 +724,7 @@ smcure.dt.Pois <- function(train, test, Var = TRUE, emmax = 1000, eps = 1e-3, nb
           if (inherits(fit, "try-error")) next
           
           pv <- try(
-            predict(fit, newdata = Zdt[vl, , drop = FALSE], type = "prob")[, "uncured"],
+            predict(fit, newdata = ZDT[vl, , drop = FALSE], type = "prob")[, "uncured"],
             silent = TRUE
           )
           if (inherits(pv, "try-error")) next
@@ -747,7 +747,7 @@ smcure.dt.Pois <- function(train, test, Var = TRUE, emmax = 1000, eps = 1e-3, nb
     }
   }
   
-  initial_mod <- rpart::rpart(nw ~ ., data = data.frame(Zdt, nw = nw), method = "class", control = rpart::rpart.control(cp = best_params$cp))
+  initial_mod <- rpart::rpart(nw ~ ., data = data.frame(ZDT, nw = nw), method = "class", control = rpart::rpart.control(cp = best_params$cp))
   
   uncureprob <- predict(initial_mod, newdata = as.data.frame(Z[, -1, drop = FALSE]), type = "prob")[, "uncured"]
   uncurepred <- predict(initial_mod, newdata = as.data.frame(Z1[, -1, drop = FALSE]), type = "prob")[, "uncured"]
@@ -756,7 +756,7 @@ smcure.dt.Pois <- function(train, test, Var = TRUE, emmax = 1000, eps = 1e-3, nb
   
   
   
-  emfit <- em.dt.Pois(Time, Status, Time1, Status1,
+  emfit <- em.DT.Pois(Time, Status, Time1, Status1,
                       X, X1, Z, Z1,
                       coxfit_train$coefficients,
                       s0_init, s01_init,
@@ -800,7 +800,7 @@ smcure.dt.Pois <- function(train, test, Var = TRUE, emmax = 1000, eps = 1e-3, nb
       }
       
       b_fit <- try(
-        em.dt.Pois(Time_b, Status_b, Time1, Status1, 
+        em.DT.Pois(Time_b, Status_b, Time1, Status1, 
                    X_b, X1, Z_b, Z1, 
                    emfit$latencyfit, s0_b, s01_init, 
                    uncureprob[boot_idx], uncurepred,
@@ -855,10 +855,10 @@ smcure.dt.Pois <- function(train, test, Var = TRUE, emmax = 1000, eps = 1e-3, nb
   return(emfit)
 }
 
-build_consensus_tree <- function(dt_fit, train_df, B = 200, seed = 123) {
+build_consensus_tree <- function(DT_fit, train_df, B = 200, seed = 123) {
   set.seed(seed)
   
-  # Rebuild scaled predictors exactly like in smcure.dt.Pois
+  # Rebuild scaled predictors exactly like in smcure.DT.Pois
   X <- model.matrix(~ x2 + x3 + x4 + x6, data = train_df)
   cols_scale <- colnames(X) %in% c("x2", "x6")
   train_scaled <- scale(X[, cols_scale])
@@ -867,7 +867,7 @@ build_consensus_tree <- function(dt_fit, train_df, B = 200, seed = 123) {
   Z <- X
   
   # Posterior uncure probabilities from final EM fit
-  w_post_tr <- as.numeric(dt_fit$w_post_tr)
+  w_post_tr <- as.numeric(DT_fit$w_post_tr)
   w_post_tr <- pmin(pmax(w_post_tr, 1e-6), 1 - 1e-6)
   
   # Final hard classes for summary tree building
@@ -902,9 +902,9 @@ build_consensus_tree <- function(dt_fit, train_df, B = 200, seed = 123) {
       method = "class",
       model = TRUE,
       control = rpart::rpart.control(
-        cp = dt_fit$best_params$cp,
-        minsplit = dt_fit$best_params$minsplit,
-        maxdepth = dt_fit$best_params$maxdepth
+        cp = DT_fit$best_params$cp,
+        minsplit = DT_fit$best_params$minsplit,
+        maxdepth = DT_fit$best_params$maxdepth
       )
     )
     
@@ -931,9 +931,9 @@ build_consensus_tree <- function(dt_fit, train_df, B = 200, seed = 123) {
     method = "class",
     model = TRUE,
     control = rpart::rpart.control(
-      cp = dt_fit$best_params$cp,
-      minsplit = dt_fit$best_params$minsplit,
-      maxdepth = dt_fit$best_params$maxdepth
+      cp = DT_fit$best_params$cp,
+      minsplit = DT_fit$best_params$minsplit,
+      maxdepth = DT_fit$best_params$maxdepth
     )
   )
   
@@ -970,8 +970,8 @@ test_df  <- Melanoma[-idx, ]
 
 
 
-#methods <- c("logit","spline","dt")
-methods <- c("dt")
+methods <- c("Logit","Spline","DT")
+
 
 
 
@@ -1009,7 +1009,7 @@ plot_test_rocs_ptcm <- function(methods, train_df, test_df,
     fits[[m]] <- out
     
     
-    if (m == "dt") {
+    if (m == "DT") {
       
       plot_tree <- out$final_tree
       
