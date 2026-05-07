@@ -1,6 +1,6 @@
 # Promotion Time Cure Model (PTCM) with Machine Learning Incidence Modeling
 
-This repository contains R code for implementing and evaluating Promotion Time Cure Models (PTCMs) using several Logit, Spline and Decision Tree approaches for the incidence component and proportional hazards regression for the latency component.
+This repository contains R code for implementing and evaluating Promotion Time Cure Models (PTCMs) using  Logit, Spline and Decision Tree approaches for the incidence component and proportional hazards regression for the latency component.
 
 The project was developed using the cutaneous melanoma dataset and includes:
 
@@ -17,7 +17,7 @@ The project was developed using the cutaneous melanoma dataset and includes:
 # Author
 
 Alimatu Agongo  
-PhD Student in Statistics  
+PhD Student in Mathematics (Statistics Track)  
 University of Texas at Arlington
 
 ---
@@ -150,9 +150,6 @@ library(rpart.plot)
 
 ## Load Data
 
-```r
-Melanoma <- read.table("melanoma-data-1.txt", header = TRUE)
-```
 
 ## Split Data
 
