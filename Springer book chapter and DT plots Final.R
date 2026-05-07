@@ -442,11 +442,7 @@ smcure.Spline.Pois <- function(train, test,  Var = TRUE, emmax = 1000, eps = 1e-
   if(any(is.na(s0_init))) s0_init[is.na(s0_init)] <- min(s0_init, na.rm = TRUE)
   if(any(is.na(s01_init))) s01_init[is.na(s01_init)] <- min(s01_init, na.rm = TRUE)
   
-  # --- FIXED Spline CONSTRUCTION ---
-  # We only apply Splines to continuous variables x2 and x6.
-  # Categorical dummies (x3, x4) remain linear.
   
-  # df = 2 is the minimum for a natural Spline to be valid.
   df_cont <- 2
   
   # Basis for Training
