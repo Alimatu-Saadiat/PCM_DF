@@ -453,14 +453,22 @@ smcure.Spline.Pois <- function(train, test,  Var = TRUE, emmax = 1000, eps = 1e-
   ns_x2 <- splines::ns(train$x2, df = df_cont)
   ns_x6 <- splines::ns(train$x6, df = df_cont)
   
-  # Build Z (Incidence Matrix)
-  # Include Intercept, Splines for x2/x6, and original dummies for x3/x4
-  Z_dummies <- model.matrix(~ x3 + x4, data = train)[, -1] # remove intercept
-  Z <- cbind(1, ns_x2, ns_x6, Z_dummies)
+   Z <- cbind(
+    1,
+    ns_x2,
+    ns_x6,
+    train$x3,
+    train$x4
+  )
   
   # Basis for Testing
-  Z1_dummies <- model.matrix(~ x3 + x4, data = test)[, -1]
-  Z1 <- cbind(1, predict(ns_x2, test$x2), predict(ns_x6, test$x6), Z1_dummies)
+  Z1 <- cbind(
+    1,
+    predict(ns_x2, test$x2),
+    predict(ns_x6, test$x6),
+    test$x3,
+    test$x4
+  )
   
   b_start <- rep(0, ncol(Z))
   beta_start <- coxfit_train$coefficients 
